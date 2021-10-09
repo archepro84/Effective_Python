@@ -4,6 +4,7 @@ def fn_1():
     print(list(a))
     print(a)
     print(a.decode())
+    pass
 
 
 # Str
@@ -12,6 +13,7 @@ def fn_2():
     print(list(a))
     print(a)
     print(a.encode())
+    pass
 
 
 # Bytes나 Str 인스턴스를 받아 항상 Str을 반환
@@ -26,6 +28,7 @@ def fn_3():
     print(repr(to_str(b'foo')))
     print(repr(to_str('bar')))
     print(repr(to_str(b'\xed\x95\x9c')))  # UTF-8에서 한글은 3Byte
+    pass
 
 
 # Bytes나 Str 인스턴스를 받아서 항상 Bytes를 반환한다.
@@ -40,12 +43,14 @@ def fn_4():
     print(repr(to_bytes(b'foo')))
     print(repr(to_bytes('bar')))
     print(repr(to_bytes('한글')))
+    pass
 
 
 # + 연산자를 사용하면 bytes를 bytes에 더하거나 str을 str에 더할 수 있다.
 def fn_5():
     print(b'one' + b'two')
     print('one' + 'two')
+    pass
 
 
 # str 인스턴스를 bytes 인스턴스에 더할 수 없다.
