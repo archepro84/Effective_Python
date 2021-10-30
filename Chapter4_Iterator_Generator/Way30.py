@@ -39,8 +39,9 @@ def fn_2():
     pass
 
 
-# itertools를 사용해
+# itertools를 사용해 파일의 내용을 한줄씩 읽어 제너레이터를 정의
 def fn_3():
+    # 제너레이터를 이용해 파일의 가장 긴 줄의 길이로 작업 메모리가 제한된다.
     def index_file(handle, search_data=' '):
         offset = 0
         for line in handle:
