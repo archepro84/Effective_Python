@@ -83,6 +83,7 @@ def fn_3():
     mock.assert_called_with(ANY, '고양이')
     pass
 
+
 # MyError를 사용해 예외 발생을 쉽게 Mocking 할 수 있는 도구를 제공한다.
 def fn_4():
     from datetime import datetime
@@ -112,7 +113,85 @@ def fn_4():
     pass
 
 
+# DB와 상호작용하기 위해 여러 동물들에게 먹이를 나누어주는 함수
 def fn_5():
+    from datetime import datetime
+    from datetime import timedelta
+    from unittest.mock import Mock, call, patch, DEFAULT
+
+    def get_animals(database, species):
+        # 데이터베이스에 질의한다
+        ...
+        # (이름, 급양시간) 튜플 리스트를 반환한다
+        return [("", datetime(2020, 1, 1, 1, 1, 1))]
+
+    def get_food_period(database, species):
+        # 데이터베이스에 질의한다
+        ...
+        # 주기를 반환한다
+        return 3
+
+    def feed_animal(database, name, when):
+        # 데이터베이스에 기록한다
+        ...
+
+    def do_rounds(database, species, *,
+                  now_func=datetime.utcnow,
+                  food_func=get_food_period,
+                  animals_func=get_animals,
+                  feed_func=feed_animal):
+        now = now_func()
+        feeding_timedelta = food_func(database, species)
+        animals = animals_func(database, species)
+        fed = 0
+
+        for name, last_mealtime in animals:
+            if (now - last_mealtime) > feeding_timedelta:
+                feed_func(database, name, now)
+                fed += 1
+        return fed
+
+    # Mock 함수 생성
+    now_func = Mock(spec=datetime.utcnow)
+    now_func.return_value = datetime(2020, 6, 5, 15, 45)
+
+    food_func = Mock(spec=get_food_period)
+    food_func.return_value = timedelta(hours=3)
+
+    animals_func = Mock(spec=get_animals)
+    animals_func.return_value = [
+        ('점박이', datetime(2020, 6, 5, 11, 15)),
+        ('털보', datetime(2020, 6, 5, 12, 30)),
+        ('조조', datetime(2020, 6, 5, 12, 45)),
+    ]
+
+    feed_func = Mock(spec=feed_animal)
+
+    # 함수 테스트
+    database = object()
+
+    result = do_rounds(
+        database,
+        '고양이',
+        now_func=now_func,
+        food_func=food_func,
+        animals_func=animals_func,
+        feed_func=feed_func)
+
+    assert result == 2
+
+    # Mock 객체에서 단 한번 호출되었는지 검증
+    food_func.assert_called_once_with(database, '고양이')
+    animals_func.assert_called_once_with(database, '고양이')
+
+    # DB에 기록하는 함수가 순서 상관없이 두 번 호출됐는지 검증
+    feed_func.assert_has_calls(
+        [
+            call(database, '점박이', now_func.return_value),
+            call(database, '털보', now_func.return_value),
+        ],
+        any_order=True)
+    # TODO Way78_1 파일로
     pass
 
 
@@ -120,6 +199,6 @@ if __name__ == '__main__':
     # fn_1()
     # fn_2()
     # fn_3()
-    fn_4()
+    # fn_4()
     # fn_5()
     pass
